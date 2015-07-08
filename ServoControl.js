@@ -1,20 +1,25 @@
 var b = require('bonescript');
-var SERVO = 'P9_16';
+var SERVOs = ['P9_14', 'P9_22'];
 
 var duty_min = 0.03;
 var position = 0;
 var increment = 0.1;
 
-b.pinMode(SERVO, b.OUTPUT);
+for(s in SERVOs) {
+    b.pinMode(SERVOs[s], b.ANALOG_OUTPUT);
+}
 updateDuty();
 
 function updateDuty() {
     // compute and adjust duty_cycle based on
     // desired position in range 0..1
     var duty_cycle = (position*0.115) + duty_min;
-    b.analogWrite(SERVO, duty_cycle, 60, scheduleNextUpdate);
+    for(s in SERVOs) {
+        b.analogWrite(SERVOs[s], duty_cycle, 60);
+    }
     console.log("Duty Cycle: " + 
         parseFloat(duty_cycle*100).toFixed(1) + " %");   
+    scheduleNextUpdate();
 }
 
 function scheduleNextUpdate() {
