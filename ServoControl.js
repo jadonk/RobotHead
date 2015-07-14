@@ -16,9 +16,8 @@ var xposition = 0.5;
 var yposition = 0.7;
 var increment = 0.1;
 //The line being read is outputed in this format: +1000 +3089 Where "+1000" is the x value and "+3089" is the y value.
-//The x and y values are split and placed into the variables below.
-var stdinx = 0;
-var stdiny = 0;
+//The x and y values are split and placed into the array below.
+var stdin = [0, 0];
 
 b.pinMode(xServo, b.ANALOG_OUTPUT);
 b.pinMode(yServo, b.ANALOG_OUTPUT);
@@ -43,21 +42,20 @@ function onLine(line) {
     //is no longer needed.
 
     //split the incoming string into it's x and y values.
-    stdinx = line.substring(0, 5);
-    stdiny = line.substring(6, 11);
+    stdin = line.split(" ");
 
     //the code below checks that if the ball is more than 20 units from the center of the screen, then
     //add an increment to the current servo position until it centers.
-    if (stdinx > 20) {
+    if (stdin[0] > 20) {
         xposition = (xposition - increment);
     }
-    if (stdinx < -20) {
+    if (stdin[0] < -20) {
         xposition = (xposition + increment);
     }
-    if (stdiny < -20) {
+    if (stdin[1] < -20) {
         yposition = (yposition + increment);
     }
-    if (stdiny > 20) {
+    if (stdin[1] > 20) {
         yposition = (yposition - increment);
     }
 }
