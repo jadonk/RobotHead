@@ -21,8 +21,8 @@ var increment = 0.1;
 var stdinx = 0;
 var stdiny = 0;
 
-b.pinMode(xServo, b.OUTPUT);
-b.pinMode(yServo, b.OUTPUT);
+b.pinMode(xServo, b.ANALOG_OUTPUT);
+b.pinMode(yServo, b.ANALOG_OUTPUT);
 updateDuty();
 
 
