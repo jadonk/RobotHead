@@ -1,39 +1,71 @@
+
+//Beginning code for reading from stding 
+//url:http://stackoverflow.com/questions/20086849/how-to-read-from-stdin-line-by-line-in-node
+var readline = require('readline');
+var rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+        terminal: false
+});
+
 var b = require('bonescript');
-var SERVOs = ['P9_14', 'P9_22'];
-
+//Define servo pinouts for neck
+var xServo = 'P9_14';
+var yServo = 'P9_22';
 var duty_min = 0.03;
-var position = 0;
+var xposition = 0.5;
+var yposition = 0.7;
 var increment = 0.1;
+//The line being read is outputed in this format: +1000 +3089 Where "+1000" is the x value and "+3089" is the y value.
+//The x and y values are split and placed into the variables below.
+var stdinx = 0;
+var stdiny = 0;
 
-for(s in SERVOs) {
-    b.pinMode(SERVOs[s], b.ANALOG_OUTPUT);
-}
+b.pinMode(xServo, b.OUTPUT);
+b.pinMode(yServo, b.OUTPUT);
 updateDuty();
 
+
 function updateDuty() {
-    // compute and adjust duty_cycle based on
-    // desired position in range 0..1
-    var duty_cycle = (position*0.115) + duty_min;
-    for(s in SERVOs) {
-        b.analogWrite(SERVOs[s], duty_cycle, 60);
-    }
-    console.log("Duty Cycle: " + 
-        parseFloat(duty_cycle*100).toFixed(1) + " %");   
-    scheduleNextUpdate();
+
+    //this section is the same as the beagleboard.org servo code but duplicated for both servos. The top
+    //analogWrite() function doesn't include "scheduleNextUpdate" so it doesn't check x/y values twice during the servo update.
+    var duty_cycle = (xposition*0.115) + duty_min;
+    b.analogWrite(xServo, duty_cycle, 60);
+    
+    var Yduty_cycle = (yposition*0.115) + duty_min;
+    b.analogWrite(yServo, Yduty_cycle, 60, scheduleNextUpdate);
+
 }
 
 function scheduleNextUpdate() {
-    // adjust position by increment and 
-    // reverse if it exceeds range of 0..1
-    position = position + increment;
-    if(position < 0) {
-        position = 0;
-        increment = -increment;
-    } else if(position > 1) {
-        position = 1;
-        increment = -increment;
-    }
-    
-    // call updateDuty after 200ms
-    setTimeout(updateDuty, 200);
+        
+        //create variable line that holds the values from the current incoming string
+        rl.on('line', function(line){
+        
+        //The tracker program used to output *'s to show that the ball was not detected. Originally I had code here to convert
+        //the *'s into 0's, but I recently changed the tracker.cpp to output 0's when the ball is not detected, so the code
+        //is no longer needed.
+        
+            
+        //split the incoming string into it's x and y values.
+        stdinx = line.substring(0,5);
+        stdiny = line.substring(6,11);
+        
+                //the code below checks that if the ball is more than 20 units from the center of the screen, then
+                //add an increment to the current servo position until it centers.
+                if (stdinx > 20){
+                        xposition = (xposition-increment);
+                }
+                if (stdinx < -20){
+                        xposition = (xposition+increment);
+                }
+                if (stdiny < -20){
+                        yposition = (yposition+increment);
+                }
+                if (stdiny > 20){
+                        yposition= (yposition-increment);
+                }
+ })
+    setTimeout(updateDuty, 10);
 }
