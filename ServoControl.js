@@ -15,6 +15,10 @@ var duty_min = 0.03;
 var xposition = 0.5;
 var yposition = 0.7;
 var increment = 0.005;
+var xmax = 1.0;
+var xmin = 0;
+var ymax = 1.0;
+var ymin = 0;
 //The line being read is outputed in this format: +1000 +3089 Where "+1000" is the x value and "+3089" is the y value.
 //The x and y values are split and placed into the array below.
 var stdin = [0, 0];
@@ -27,6 +31,25 @@ updateDuty();
 rl.on('line', onLine);
 
 function updateDuty() {
+    //the code below checks that if the ball is more than 20 units from the center of the screen, then
+    //add an increment to the current servo position until it centers.
+    if (stdin[0] > 20) {
+        xposition = (xposition - increment);
+    }
+    if (stdin[0] < -20) {
+        xposition = (xposition + increment);
+    }
+    if (stdin[1] < -20) {
+        yposition = (yposition + increment);
+    }
+    if (stdin[1] > 20) {
+        yposition = (yposition - increment);
+    }
+    if (xposition < xmin) xposition = xmin;
+    if (xposition > xmax) xposition = xmax;
+    if (yposition < ymin) yposition = ymin;
+    if (yposition > ymax) yposition = ymax;
+
     //this section is the same as the beagleboard.org servo code but duplicated for both servos. The top
     //analogWrite() function doesn't include "scheduleNextUpdate" so it doesn't check x/y values twice during the servo update.
     var duty_cycle = (xposition * 0.115) + duty_min;
@@ -43,21 +66,6 @@ function onLine(line) {
 
     //split the incoming string into it's x and y values.
     stdin = line.split(" ");
-
-    //the code below checks that if the ball is more than 20 units from the center of the screen, then
-    //add an increment to the current servo position until it centers.
-    if (stdin[0] > 20) {
-        xposition = (xposition - increment);
-    }
-    if (stdin[0] < -20) {
-        xposition = (xposition + increment);
-    }
-    if (stdin[1] < -20) {
-        yposition = (yposition + increment);
-    }
-    if (stdin[1] > 20) {
-        yposition = (yposition - increment);
-    }
 }
 
 function scheduleNextUpdate() {
