@@ -14,7 +14,7 @@ var yServo = 'P9_22';
 var duty_min = 0.03;
 var xposition = 0.5;
 var yposition = 0.7;
-var increment = 0.1;
+var increment = 0.005;
 //The line being read is outputed in this format: +1000 +3089 Where "+1000" is the x value and "+3089" is the y value.
 //The x and y values are split and placed into the array below.
 var stdin = [0, 0];
