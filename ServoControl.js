@@ -7,7 +7,7 @@ var rl = readline.createInterface({
     terminal: false
 });
 
-var b = require('bonescript');
+
 //Define servo pinouts for neck
 var xServo = 'P9_14';
 var yServo = 'P9_22';
@@ -22,10 +22,16 @@ var ymin = 0;
 //The line being read is outputed in this format: +1000 +3089 Where "+1000" is the x value and "+3089" is the y value.
 //The x and y values are split and placed into the array below.
 var stdin = [0, 0];
+var stdintest = true; // set to true to just test the updates without driving the hardware
+var printStatus = 0; // set to -1 to disable status printing
 
-b.pinMode(xServo, b.ANALOG_OUTPUT);
-b.pinMode(yServo, b.ANALOG_OUTPUT);
+if (!stdintest) {
+    var b = require('bonescript');
+    b.pinMode(xServo, b.ANALOG_OUTPUT);
+    b.pinMode(yServo, b.ANALOG_OUTPUT);
+}
 updateDuty();
+
 
 //create variable line that holds the values from the current incoming string
 rl.on('line', onLine);
@@ -50,6 +56,12 @@ function updateDuty() {
     if (yposition < ymin) yposition = ymin;
     if (yposition > ymax) yposition = ymax;
 
+    //skip the hardware update if in test mode
+    if (stdintest) {
+        scheduleNextUpdate();
+        return;
+    }
+
     //this section is the same as the beagleboard.org servo code but duplicated for both servos. The top
     //analogWrite() function doesn't include "scheduleNextUpdate" so it doesn't check x/y values twice during the servo update.
     var duty_cycle = (xposition * 0.115) + duty_min;
@@ -60,6 +72,7 @@ function updateDuty() {
 }
 
 function onLine(line) {
+    console.log('readline: ' + line);
     //The tracker program used to output *'s to show that the ball was not detected. Originally I had code here to convert
     //the *'s into 0's, but I recently changed the tracker.cpp to output 0's when the ball is not detected, so the code
     //is no longer needed.
@@ -69,5 +82,11 @@ function onLine(line) {
 }
 
 function scheduleNextUpdate() {
+    if (printStatus > 0) {
+        printStatus--;
+    } else if (printStatus == 0) {
+        console.log('position: ' + xposition + ',' + yposition);
+        printStatus = 10;
+    }
     setTimeout(updateDuty, 10);
 }
