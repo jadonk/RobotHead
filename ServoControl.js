@@ -23,7 +23,7 @@ var ymin = 0;
 //The x and y values are split and placed into the array below.
 var stdin = [0, 0];
 var stdintest = true; // set to true to just test the updates without driving the hardware
-var printStatus = 0; // set to -1 to disable status printing
+var printStatus = -1; // set to 0 to enable status printing
 
 if (!stdintest) {
     var b = require('bonescript');
