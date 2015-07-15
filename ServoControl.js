@@ -22,7 +22,7 @@ var ymin = 0;
 //The line being read is outputed in this format: +1000 +3089 Where "+1000" is the x value and "+3089" is the y value.
 //The x and y values are split and placed into the array below.
 var stdin = [0, 0];
-var stdintest = true; // set to true to just test the updates without driving the hardware
+var stdintest = false; // set to true to just test the updates without driving the hardware
 var printStatus = -1; // set to 0 to enable status printing
 
 if (!stdintest) {
